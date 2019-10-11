@@ -91,6 +91,47 @@ router.get("/projects/:id/resources", (req, res) => {
     });
 });
 
+router.post("/projects", (req, res) => {
+  
+ projectsModel
+   .addProject(req.body)
+   .then(project => {
+     res.status(201).json(project);
+   })
+   .catch(err => {
+     res.status(500).json({ message: "Failed to create new project" });
+   });
+});
+router.post("/resources", (req, res) => {
+  projectsModel
+    .addResource(req.body)
+    .then(resource => {
+      res.status(201).json(req.body);
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Failed to create new resource" });
+    });
+});
+
+
+router.post("/projects/:id/tasks", (req, res) => {
+  
+  projectsModel.findProjectById(req.params.id)
+    .then(project => {
+      if (project) {
+        projectsModel.addTask(req.body, req.params.id).then(task => {
+          res.status(201).json(task);
+        });
+      } else {
+        res
+          .status(404)
+          .json({ message: "Could not find project with given id." });
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: "Failed to create new task" });
+    });
+});
 
 
 module.exports = router;
