@@ -12,14 +12,20 @@ module.exports = {
 };
 
 function findProjects() {
-  return db("projects");
+    return db("projects").then((projects) => {
+        return projects.map(project => itemToBody(project));
+    }
+        
+  );
 }
 
 function findProjectById(id) {
   return (
     db("projects")
       .where({ id })
-      .first() 
+          .first().then((project) => {
+          return itemToBody(project);
+      }) 
   );
 }
 function findResoureces() {
@@ -36,7 +42,9 @@ function findTasksByProjectId(project_id) {
       "task_description",
       "task_note",
       "tasks.completed" 
-    );
+  ).then((tasks) => {
+         return tasks.map(task => itemToBody(task));
+    });
 }
 
 function findResourcesByProjectId(project_id) {
@@ -82,3 +90,16 @@ function addTask(task, project_id) {
         });
     });
 }
+
+
+function intToBoolean(int) {
+  return int === 1 ? true : false;
+}
+
+function itemToBody(item) {
+  return {
+    ...item,
+    completed: intToBoolean(item.completed)
+  };
+}
+
